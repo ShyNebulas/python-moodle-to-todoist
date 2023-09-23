@@ -7,10 +7,17 @@ from todoist_api_python.api import TodoistAPI
 load_dotenv()
 
 blacklisted_terms = ["weekly", "support", "session", "submission", "slides", "zoom", "folder", "forum", "discussion", "solution"]
+def check_word_against_blacklist(word):
+    for blacklisted_term in blacklisted_terms:
+        if re.search(r"\b({0})\b".format(blacklisted_term), word, flags=re.IGNORECASE):
+            return True
+    return False
+
 with os.scandir("html") as directory:
     for entry in directory:
         if not entry.name.startswith('.') and entry.is_file():
             with open(entry.path, "r") as file:
+                print(entry.name)
                 soup = BeautifulSoup(file, "html.parser")
                 sections = soup.select(".content")
                 for section in sections: 
@@ -18,7 +25,13 @@ with os.scandir("html") as directory:
                     if section_name: print(section_name[0].text)
                     items = section.select(".instancename")
                     for item in items:
-                        print(item.text)
+                        if not check_word_against_blacklist(item.text):
+                           print(item.text)
+        
+
+
+
+                        
                        
 
 
