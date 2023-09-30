@@ -25,8 +25,12 @@ def create():
     with config_path.open(mode="w", encoding="utf-8") as file:
         json.dump(default, file, indent=4)
 
+def contents(key: str):
+    with config_path.open(mode="r+", encoding="utf-8") as file:
+        console.print(json.load(file)[key])
+
 def add(word: str, key: str):
-     with config_path.open(mode="r+", encoding="utf-8") as file:
+    with config_path.open(mode="r+", encoding="utf-8") as file:
         updated_json = json.load(file)
         if word not in updated_json[key]:
             updated_json[key].append(word)

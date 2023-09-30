@@ -24,7 +24,7 @@ def main(ctx: typer.Context):
     if not config.exists():
         config.create()
     if ctx.invoked_subcommand is None:
-        print("yes")
+        config.contents("blacklist")
         
 if __name__ == "__main__":
     app()
