@@ -2,13 +2,15 @@ import typer
 from pathlib import Path
 import json
 
-from themes import console
+from rich import print
 
 APP_NAME = "python-moodle-to-todoist"
 
 default = {
     "blacklist": ["attendance", "booking", "discussion", "folder", "forum", "handbook", "reading", "selection", "session", "slides", "solution", "submission", "support", "weekly", "zoom"],
-    "blacklist_default": ["attendance", "booking", "discussion", "folder", "forum", "handbook", "reading", "selection", "session", "slides", "solution", "submission", "support", "weekly", "zoom"]
+    "blacklist_default": ["attendance", "booking", "discussion", "folder", "forum", "handbook", "reading", "selection", "session", "slides", "solution", "submission", "support", "weekly", "zoom"],
+    "stripped": ["file", "link", "page", "reading", "video", "web"],
+    "stripped_default": ["file", "link", "page", "reading", "video", "web"]
 }
 
 directory_path = Path(typer.get_app_dir(APP_NAME))
@@ -20,19 +22,19 @@ def exists():
 def create():
     if not directory_path.is_dir():
         directory_path.mkdir(mode=0o777, parents=False, exist_ok=True)
-        console.print(f"Created {directory_path}")
+        print(f"Created {directory_path}")
     config_path.touch(mode=0o666, exist_ok=True)
-    console.print(f"Created {config_path}")
+    print(f"Created {config_path}")
     with config_path.open(mode="w", encoding="utf-8") as file:
         json.dump(default, file, indent=4)
 
-def get_path():
-    console.print(f"'{config_path}'")
+def get_path(key: str):
+    print(f"'{config_path}' --> {key}")
 
 def contents(key: str):
     with config_path.open(mode="r+", encoding="utf-8") as file:
         json_contents = json.load(file)
-        console.print(json_contents[key])
+        print(json_contents[key])
 
 def add(word: str, key: str):
     with config_path.open(mode="r+", encoding="utf-8") as file:
@@ -41,9 +43,9 @@ def add(word: str, key: str):
             updated_json[key].append(word)
             file.seek(0)
             json.dump(updated_json, file, indent=4)
-            console.print(f"'{word}' added to {key}")
+            print(f"'{word}' added to {key}")
         else:
-            console.print(f"'{word}' already exists within the {key}")
+            print(f"'{word}' already exists within the {key}")
 
 def remove(word: str, key: str):
      print(config_path)
@@ -54,9 +56,9 @@ def remove(word: str, key: str):
             file.seek(0)
             json.dump(updated_json, file, indent=4)
             file.truncate()
-            console.print(f"'{word}' removed from {key}")
+            print(f"'{word}' removed from {key}")
         else:
-            console.print(f"'{word}' doesn't exist within the {key}")
+            print(f"'{word}' doesn't exist within the {key}")
     
 def remove_all(key: str):
     with config_path.open(mode="r+", encoding="utf-8") as file:
@@ -65,7 +67,7 @@ def remove_all(key: str):
         file.seek(0)
         json.dump(updated_json, file, indent=4)
         file.truncate()
-        console.print(f"Cleared contents of {key}")
+        print(f"Cleared contents of {key}")
 
 def restore_to_default(key: str, updated_key: str):
     with config_path.open(mode="r+", encoding="utf-8") as file:
@@ -74,7 +76,7 @@ def restore_to_default(key: str, updated_key: str):
         file.seek(0)
         json.dump(updated_json, file, indent=4)
         file.truncate()
-        console.print(f"Restored {key} with {updated_key}")
+        print(f"Restored {key} with {updated_key}")
 
 
 

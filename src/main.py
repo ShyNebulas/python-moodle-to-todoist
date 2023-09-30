@@ -12,11 +12,12 @@ from rich import print
 import typer
 
 import blacklist
-from themes import console
+import stripped
 
 app = typer.Typer()
 
 app.add_typer(blacklist.app, name="blacklist", help="Manage blacklist", invoke_without_command=True)
+app.add_typer(stripped.app, name="stripped", help="Manage stripped list", invoke_without_command=True)
 
 if __name__ == "__main__":
     app()
