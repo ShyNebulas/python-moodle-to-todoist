@@ -27,7 +27,8 @@ def create():
 
 def contents(key: str):
     with config_path.open(mode="r+", encoding="utf-8") as file:
-        console.print(json.load(file)[key])
+        json_contents = json.load(file)
+        console.print(json_contents[key])
 
 def add(word: str, key: str):
     with config_path.open(mode="r+", encoding="utf-8") as file:
@@ -53,6 +54,14 @@ def remove(word: str, key: str):
         else:
             console.print(f"'{word}' doesn't exist within the {key}")
     
-        
+def remove_all(key: str):
+    with config_path.open(mode="r+", encoding="utf-8") as file:
+        updated_json = json.load(file)
+        updated_json[key].clear()
+        file.seek(0)
+        json.dump(updated_json, file, indent=4)
+        file.truncate()
+        console.print(f"Cleared contents of {key}")
+
 
         

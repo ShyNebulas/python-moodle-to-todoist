@@ -19,8 +19,21 @@ def remove(word: Annotated[str, typer.Argument(help="The word to be removed from
     """
     config.remove(word, "blacklist")
 
+@app.command()
+def remove_all(force: Annotated[bool, typer.Option("--force", "-f", prompt="Are you sure you want to clear the blacklist?", help="Force deletion without confirmation")] = False):
+    """
+    Clears contents of the blacklist
+
+    If --force/-f is not used, will ask for confirmation.
+    """
+    if force:
+        config.remove_all("blacklist")
+
 @app.callback(invoke_without_command=True)
-def main(ctx: typer.Context):
+def blacklist_callback(ctx: typer.Context):
+    """
+    Displays contents of the blacklist
+    """
     if not config.exists():
         config.create()
     if ctx.invoked_subcommand is None:
