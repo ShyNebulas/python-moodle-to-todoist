@@ -7,11 +7,12 @@ from themes import console
 APP_NAME = "python-moodle-to-todoist"
 
 default = {
-    "blacklist": ["attendance", "booking", "discussion", "folder", "forum", "handbook", "reading", "selection", "session", "slides", "solution", "submission", "support", "weekly", "zoom"]
+    "blacklist": ["attendance", "booking", "discussion", "folder", "forum", "handbook", "reading", "selection", "session", "slides", "solution", "submission", "support", "weekly", "zoom"],
+    "blacklist_default": ["attendance", "booking", "discussion", "folder", "forum", "handbook", "reading", "selection", "session", "slides", "solution", "submission", "support", "weekly", "zoom"]
 }
 
 directory_path = Path(typer.get_app_dir(APP_NAME))
-config_path = directory_path / "config.json"
+config_path = directory_path / ".config.json"
 
 def exists():
     return config_path.is_file()
@@ -24,6 +25,9 @@ def create():
     console.print(f"Created {config_path}")
     with config_path.open(mode="w", encoding="utf-8") as file:
         json.dump(default, file, indent=4)
+
+def get_path():
+    console.print(f"'{config_path}'")
 
 def contents(key: str):
     with config_path.open(mode="r+", encoding="utf-8") as file:
@@ -62,6 +66,16 @@ def remove_all(key: str):
         json.dump(updated_json, file, indent=4)
         file.truncate()
         console.print(f"Cleared contents of {key}")
+
+def restore_to_default(key: str, updated_key: str):
+    with config_path.open(mode="r+", encoding="utf-8") as file:
+        updated_json = json.load(file)
+        updated_json[key] = updated_json[updated_key]
+        file.seek(0)
+        json.dump(updated_json, file, indent=4)
+        file.truncate()
+        console.print(f"Restored {key} with {updated_key}")
+
 
 
         
