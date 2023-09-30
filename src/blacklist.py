@@ -1,4 +1,5 @@
 import typer
+from typing import List
 from typing_extensions import Annotated
 
 import config
@@ -6,18 +7,20 @@ import config
 app = typer.Typer()
 
 @app.command()
-def add(word: Annotated[str, typer.Argument(help="The word to be added to the blacklist")]):
+def add(words: Annotated[List[str], typer.Argument(help="The word(s) to be added to the blacklist")]):
     """
-    Add a word to the blacklist
+    Add a word(s) to the blacklist
     """
-    config.add(word, "blacklist")
+    for word in words:
+        config.add(word, "blacklist")
 
 @app.command()
-def remove(word: Annotated[str, typer.Argument(help="The word to be removed from the blacklist")]):
+def remove(words: Annotated[List[str], typer.Argument(help="The word(s) to be removed from the blacklist")]):
     """
-    Remove a word from the blacklist
+    Remove a word(s) from the blacklist
     """
-    config.remove(word, "blacklist")
+    for word in words:
+        config.remove(word, "blacklist")
 
 @app.command()
 def remove_all(force: Annotated[bool, typer.Option("--force", "-f", prompt="Are you sure you want to clear the blacklist?", help="Force deletion without confirmation")] = False):
