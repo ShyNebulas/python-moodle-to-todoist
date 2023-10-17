@@ -24,7 +24,6 @@ def folder(path: Annotated[Path, typer.Argument(help="The folder path to be set"
     except KeyError as error:
         print(error)
 
-#TODO: IGNORE BLACKLIST OR STRIPPED LIST, use default stripped or blacklist instead, overide folder aswell, or give single file
 @app.callback()
 def run(
         ctx: typer.Context,
@@ -32,7 +31,6 @@ def run(
         ignore_stripped: Annotated[bool, typer.Option("--ignore-stripped", "-is", help="Ignores the stripped list when running")] = False,
         ignore_clean: Annotated[bool, typer.Option("--ignore-clean", "-ic", help="Ignores cleaning each instance when running")] = False
     ):
-
     if ctx.invoked_subcommand is None:
         try:
             todoist_key: str = _config.get_value("todoist_key")
@@ -79,16 +77,15 @@ def run(
                         print(f"{klass} has no 'project' key set")
                         raise typer.Exit(code=1)
                     project = projects[klass.lower()]
-
                     for title, content in pairs.items():
-                        section = api.add_section( project_id = project, name=title)
+                        section = api.add_section(project_id = project, name=title)
                         for task in content.splitlines():
                             api.add_task(
                                 project_id = project,
                                 section_id = section.id,
                                 content = task
                             )
-
+                            print(f"Added '{task}' to '{section.name}'")
         except (NotADirectoryError, KeyError) as error:
             print(error)
 
