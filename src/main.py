@@ -1,23 +1,12 @@
-import os
-import dotenv
-from bs4 import BeautifulSoup
-import re
-from todoist_api_python.api import TodoistAPI
-
-
-from pathlib import Path
-
-from rich import print
-
 import typer
 
-import blacklist
-import stripped
+import config
+import run
 
 app = typer.Typer()
 
-app.add_typer(blacklist.app, name="blacklist", help="Manage blacklist", invoke_without_command=True)
-app.add_typer(stripped.app, name="stripped", help="Manage stripped list", invoke_without_command=True)
+app.add_typer(config.app, name="config")
+app.add_typer(run.app, name="run", invoke_without_command=True)
 
 if __name__ == "__main__":
     app()
@@ -56,30 +45,7 @@ if __name__ == "__main__":
 
 
 
-# APP_NAME = "python-moodle-to-todoist"
-# def main():
-#     env_path = Path("../.env")
-#     if not env_path.is_file():
-#         console.print("[warning][Warning][/warning] Required '.env' file does not exist")
-#         env_path.touch(mode=0o600, exist_ok=False)
-#         console.print("Created '.env' file")
-#     if "TODOIST_API_KEY" not in dotenv.dotenv_values(env_path):
-#         console.print("[warning][Warning][/warning] Required '.env' field 'TODOIST_API_KEY' does not exist")
-#         value = typer.prompt("Enter your Todoist API key", hide_input=True)
-#         dotenv.set_key(dotenv_path=env_path, key_to_set="TODOIST_API_KEY", value_to_set=value)
-#     dotenv.load_dotenv(env_path)    
-#     todoist_api = TodoistAPI(os.getenv("TODOIST_API_KEY"))
-#     result = None
-#     while result is None:
-#         try:
-#             result = todoist_api.get_projects()
-#         except Exception as error:
-#             # TODO: Add proper error support
-#             console.print("[failure][Failure][/failure] Incorrect API key")
-#             value = typer.prompt("Enter your Todoist API key", hide_input=True)
-#             dotenv.set_key(dotenv_path=env_path, key_to_set="TODOIST_API_KEY", value_to_set=value)
-#             dotenv.load_dotenv(env_path, override=True)  
-#             todoist_api = TodoistAPI(os.getenv("TODOIST_API_KEY"))
+
             
 
 
@@ -89,10 +55,6 @@ if __name__ == "__main__":
 
 
    
-
-
-
-
 
 # with os.scandir("html") as directory:
 #     for entry in directory:
@@ -125,11 +87,3 @@ if __name__ == "__main__":
 
 
 
-# todoist_api_key = os.getenv("TODOIST_API_KEY")
-# api = TodoistAPI(todoist_api_key)
-
-# try:
-#     projects = api.get_projects()
-#     print(projects)
-# except Exception as error:
-#     print(error)

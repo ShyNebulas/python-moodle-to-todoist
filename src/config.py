@@ -1,83 +1,32 @@
 import typer
-from pathlib import Path
-import json
-
 from rich import print
+from pathlib import Path
 
-APP_NAME = "python-moodle-to-todoist"
+import _config
 
-default = {
-    "blacklist": ["attendance", "booking", "discussion", "folder", "forum", "handbook", "reading", "selection", "session", "slides", "solution", "submission", "support", "weekly", "zoom"],
-    "blacklist_default": ["attendance", "booking", "discussion", "folder", "forum", "handbook", "reading", "selection", "session", "slides", "solution", "submission", "support", "weekly", "zoom"],
-    "stripped": ["file", "link", "page", "reading", "video", "web"],
-    "stripped_default": ["file", "link", "page", "reading", "video", "web"]
-}
+import blacklist
+import stripped
+import projects
+import todoist
 
-directory_path = Path(typer.get_app_dir(APP_NAME))
-config_path = directory_path / ".config.json"
+app = typer.Typer()
 
-def exists():
-    return config_path.is_file()
-    
-def create():
-    if not directory_path.is_dir():
-        directory_path.mkdir(mode=0o777, parents=False, exist_ok=True)
-        print(f"Created {directory_path}")
-    config_path.touch(mode=0o666, exist_ok=True)
-    print(f"Created {config_path}")
-    with config_path.open(mode="w", encoding="utf-8") as file:
-        json.dump(default, file, indent=4)
+app.add_typer(blacklist.app, name="blacklist", help="Manage words to be blacklisted", invoke_without_command=True)
+app.add_typer(stripped.app, name="stripped", help="Manage words to be stripped", invoke_without_command=True)
+app.add_typer(todoist.app, name="todoist", help="Manage todoist configurations and tags", invoke_without_command=True)
 
-def get_path(key: str):
-    print(f"'{config_path}' --> {key}")
+@app.command()
+def path():
+    """
+    Returns the configuration path
+    """
+    print(_config.get_path())
 
-def contents(key: str):
-    with config_path.open(mode="r+", encoding="utf-8") as file:
-        json_contents = json.load(file)
-        print(json_contents[key])
+@app.callback()
+def config(ctx: typer.Context):
+    if not _config.exists():
+        result: tuple[Path, Path] = _config.create()
+        for value in result: print(f"Created {value}")
 
-def add(word: str, key: str):
-    with config_path.open(mode="r+", encoding="utf-8") as file:
-        updated_json = json.load(file)
-        if word not in updated_json[key]:
-            updated_json[key].append(word)
-            file.seek(0)
-            json.dump(updated_json, file, indent=4)
-            print(f"'{word}' added to {key}")
-        else:
-            print(f"'{word}' already exists within the {key}")
-
-def remove(word: str, key: str):
-     print(config_path)
-     with config_path.open(mode="r+", encoding="utf-8") as file:
-        updated_json = json.load(file)
-        if word in updated_json[key]:
-            updated_json[key].remove(word)
-            file.seek(0)
-            json.dump(updated_json, file, indent=4)
-            file.truncate()
-            print(f"'{word}' removed from {key}")
-        else:
-            print(f"'{word}' doesn't exist within the {key}")
-    
-def remove_all(key: str):
-    with config_path.open(mode="r+", encoding="utf-8") as file:
-        updated_json = json.load(file)
-        updated_json[key].clear()
-        file.seek(0)
-        json.dump(updated_json, file, indent=4)
-        file.truncate()
-        print(f"Cleared contents of {key}")
-
-def restore_to_default(key: str, updated_key: str):
-    with config_path.open(mode="r+", encoding="utf-8") as file:
-        updated_json = json.load(file)
-        updated_json[key] = updated_json[updated_key]
-        file.seek(0)
-        json.dump(updated_json, file, indent=4)
-        file.truncate()
-        print(f"Restored {key} with {updated_key}")
-
-
-
-        
+if __name__ == "__main__":
+    app()
